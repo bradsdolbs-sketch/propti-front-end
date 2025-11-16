@@ -1,0 +1,299 @@
+import { useRouter } from "next/router";
+import AgentLayout from "../../../layouts/AgentLayout";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "../../../components/ui/card";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
+
+type TenancyStatus = "Active" | "Ending soon" | "Past";
+
+interface AgentTenancyDetail {
+  id: string;
+  propertyLabel: string;
+  postcode: string;
+  landlordName: string;
+  landlordEmail?: string;
+  tenants: string[];
+  start: string;
+  end: string;
+  rent: number;
+  deposit: number;
+  status: TenancyStatus;
+  // Simple flags – think of this as the link to landlord/tenant portals
+  tenantPortalEnabled: boolean;
+  landlordPortalEnabled: boolean;
+}
+
+const tenancies: AgentTenancyDetail[] = [
+  {
+    id: "TEN-1001",
+    propertyLabel: "22 Anthony House, Pembury Place",
+    postcode: "E5 8GZ",
+    landlordName: "Bipin Uka",
+    landlordEmail: "bipin@example.com",
+    tenants: ["Danise Fang", "Phuong Ly"],
+    start: "2025-06-12",
+    end: "2026-06-11",
+    rent: 2000,
+    deposit: 2308,
+    status: "Active",
+    tenantPortalEnabled: true,
+    landlordPortalEnabled: true,
+  },
+  {
+    id: "TEN-1002",
+    propertyLabel: "Central Gate, Commercial Road",
+    postcode: "E1 1LN",
+    landlordName: "Central Gate Holdings Ltd",
+    landlordEmail: "landlord@centralgate.com",
+    tenants: ["John Smith"],
+    start: "2025-12-01",
+    end: "2026-11-30",
+    rent: 1750,
+    deposit: 2000,
+    status: "Active",
+    tenantPortalEnabled: false,
+    landlordPortalEnabled: true,
+  },
+];
+
+function statusVariant(status: TenancyStatus): "success" | "warning" | "default" {
+  switch (status) {
+    case "Active":
+      return "success";
+    case "Ending soon":
+      return "warning";
+    case "Past":
+      return "default";
+  }
+}
+
+function formatGBP(value: number): string {
+  return `£${value.toFixed(0)}`;
+}
+
+export default function AgentTenancyDetailPage() {
+  const router = useRouter();
+  const { id } = router.query;
+
+  const tenancy = tenancies.find((t) => t.id === id);
+
+  if (!tenancy) {
+    return (
+      <AgentLayout>
+        <div className="max-w-5xl mx-auto">
+          <p className="text-sm text-slate-500">Tenancy not found.</p>
+        </div>
+      </AgentLayout>
+    );
+  }
+
+  const startDate = new Date(tenancy.start).toLocaleDateString("en-GB");
+  const endDate = new Date(tenancy.end).toLocaleDateString("en-GB");
+
+  return (
+    <AgentLayout>
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p
+              className="text-xs text-slate-500 cursor-pointer hover:underline"
+              onClick={() => router.push("/agent/tenancies")}
+            >
+              ← Back to tenancies
+            </p>
+            <h1 className="text-2xl font-semibold text-slate-900 mt-2">
+              {tenancy.propertyLabel}
+            </h1>
+            <p className="text-sm text-slate-500">
+              {tenancy.postcode} · {tenancy.id}
+            </p>
+          </div>
+          <div className="text-right space-y-2">
+            <Badge variant={statusVariant(tenancy.status)}>
+              {tenancy.status}
+            </Badge>
+            <p className="text-xs text-slate-500">
+              Term: <span className="font-medium">{startDate}</span> –{" "}
+              <span className="font-medium">{endDate}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Top row – landlord + tenants + financials */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {/* Landlord */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Landlord</CardTitle>
+              <CardDescription>
+                Contact details and portal status.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-3">
+              <div>
+                <p className="text-xs text-slate-500">Name</p>
+                <p className="font-medium">{tenancy.landlordName}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Email</p>
+                <p className="font-medium">
+                  {tenancy.landlordEmail ?? "Not captured"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Landlord portal</p>
+                <Badge
+                  variant={
+                    tenancy.landlordPortalEnabled ? "success" : "default"
+                  }
+                >
+                  {tenancy.landlordPortalEnabled ? "Enabled" : "Disabled"}
+                </Badge>
+              </div>
+              <Button size="sm" variant="outline" disabled>
+                Manage landlord access (demo)
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Tenants */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tenants</CardTitle>
+              <CardDescription>
+                Occupiers linked to this tenancy.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-3">
+              <div>
+                <p className="text-xs text-slate-500">Names</p>
+                <p className="font-medium">
+                  {tenancy.tenants.join(", ")}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Tenant portal</p>
+                <Badge
+                  variant={tenancy.tenantPortalEnabled ? "success" : "default"}
+                >
+                  {tenancy.tenantPortalEnabled ? "Enabled" : "Disabled"}
+                </Badge>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                In future this would show which tenants have activated their
+                accounts and last login times.
+              </p>
+              <Button size="sm" variant="outline" disabled>
+                Manage tenant access (demo)
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Financials */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Financials</CardTitle>
+              <CardDescription>
+                Rent and deposit as per AST.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-3">
+              <div>
+                <p className="text-xs text-slate-500">Rent</p>
+                <p className="font-medium">{formatGBP(tenancy.rent)} / month</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Deposit</p>
+                <p className="font-medium">
+                  {formatGBP(tenancy.deposit)}
+                </p>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                You could later link this to actual rent collection data or a
+                client account integration.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Second row – documents + maintenance + references */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {/* Documents */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Documents</CardTitle>
+              <CardDescription>
+                Tenancy docs shared with landlord & tenants.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <p>AST · Deposit certificate · Gas safety · EICR · EPC</p>
+              <p className="text-[11px] text-slate-400">
+                Mirrors what the tenant sees in their Documents tab and what
+                the landlord sees in their portal.
+              </p>
+              <Button size="sm" variant="outline" disabled>
+                Open document folder (demo)
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Maintenance */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Maintenance</CardTitle>
+              <CardDescription>
+                Requests & jobs linked to this tenancy.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <p>
+                For now, imagine this showing a list like:
+                <br />
+                <span className="font-medium">
+                  • Boiler not working (In progress) – ABC Plumbing
+                  <br />
+                  • Leaking sink (Completed) – Central Gate Maintenance
+                </span>
+              </p>
+              <Button size="sm" variant="outline" disabled>
+                View maintenance for this tenancy (demo)
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* References */}
+          <Card>
+            <CardHeader>
+              <CardTitle>References</CardTitle>
+              <CardDescription>
+                Onboarding status for this tenancy.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <p>
+                ID, right to rent, affordability, guarantor – all centralised
+                against this one tenancy.
+              </p>
+              <p className="text-[11px] text-slate-400">
+                Ties into the Admin verification screens you already have and
+                could be exposed in a lightweight way to landlords as a
+                &quot;tick list&quot;.
+              </p>
+              <Button size="sm" variant="outline" disabled>
+                Open reference pack (demo)
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </AgentLayout>
+  );
+}
