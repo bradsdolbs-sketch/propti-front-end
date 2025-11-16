@@ -1,149 +1,269 @@
 import Link from "next/link";
+import { Button } from "../components/ui/button";
 import {
   Building2,
-  UserRound,
   Wrench,
+  Users,
   ShieldCheck,
-  Home,
-  Briefcase,
+  MessageSquare,
+  ArrowRight,
 } from "lucide-react";
 
-export default function PortalChooserPage() {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-6xl py-16">
-        <div className="text-center mb-12">
-          <p className="text-xs tracking-[0.25em] text-slate-400 mb-3">
-            PROPTI
-          </p>
-          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-3">
-            Maintenance, done properly.
-          </h1>
-          <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">
-            Choose a portal to preview how Propti works for landlords, owners,
-            tenants, contractors, agents, and your internal admin team.
-          </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* NAVBAR */}
+      <header className="w-full border-b border-slate-200 bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Logo / brand */}
+          <Link href="/" className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center text-xs font-bold text-white">
+              P
+            </div>
+            <div className="flex flex-col leading-tight">
+              <span className="text-sm font-semibold text-slate-900">
+                Propti
+              </span>
+              <span className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                Maintenance-first
+              </span>
+            </div>
+          </Link>
+
+          {/* Right side: auth buttons */}
+          <nav className="flex items-center gap-3">
+            <Link href="/login">
+              <Button
+                variant="outline"
+                className="text-xs sm:text-sm px-3 py-1.5"
+              >
+                Sign in
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button className="text-xs sm:text-sm px-3 py-1.5">
+                Create account
+              </Button>
+            </Link>
+          </nav>
         </div>
+      </header>
 
-        {/* GRID OF PORTALS */}
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {/* Landlord portal */}
-          <PortalCard
-            title="Landlord portal"
-            description="Approve requests, assign contractors, see billing."
-            metaTitle="Demo user: Central Gate Estates"
-            metaBody="Properties, requests, billing and settings."
-            href="/landlord"
-            cta="Enter"
-            icon={<Building2 className="h-5 w-5" />}
-          />
+      {/* MAIN CONTENT */}
+      <main className="flex-1">
+        {/* HERO / WELCOME SECTION */}
+        <section className="border-b border-slate-200 bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 py-12 md:py-16 grid gap-10 md:grid-cols-2 items-center">
+            <div>
+              <p className="text-xs tracking-[0.25em] text-slate-400 mb-3">
+                WELCOME TO PROPTI
+              </p>
+              <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 leading-tight mb-3">
+                Maintenance, done properly for{" "}
+                <span className="underline decoration-slate-300">
+                  every part
+                </span>{" "}
+                of the tenancy chain.
+              </h1>
+              <p className="text-sm md:text-base text-slate-600 mb-6 max-w-xl">
+                Propti connects landlords, agents, tenants and contractors in a
+                single, shared view of every maintenance issue. No more missed
+                messages, lost photos or “who’s chasing this?”.
+              </p>
 
-          {/* Tenant portal */}
-          <PortalCard
-            title="Tenant portal"
-            description="Raise issues, track progress, see job history."
-            metaTitle="Demo property: 22 Anthony House"
-            metaBody="AI triage, requests and status updates."
-            href="/tenant"
-            cta="Enter"
-            icon={<UserRound className="h-5 w-5" />}
-          />
+              <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                <Link href="/signup" className="sm:flex-1">
+                  <Button className="w-full flex items-center justify-center gap-2">
+                    <span>Get started free</span>
+                    <ArrowRight size={14} />
+                  </Button>
+                </Link>
+                <Link href="/portals" className="sm:flex-1">
+                  <Button
+                    variant="outline"
+                    className="w-full flex items-center justify-center gap-2 text-slate-700"
+                  >
+                    Preview the portals
+                  </Button>
+                </Link>
+              </div>
 
-          {/* Contractor portal */}
-          <PortalCard
-            title="Contractor portal"
-            description="View offers, booked jobs, and mark work complete."
-            metaTitle="Demo company: ABC Plumbing"
-            metaBody="Jobs list and job details."
-            href="/contractor"
-            cta="Enter"
-            icon={<Wrench className="h-5 w-5" />}
-          />
+              <p className="text-[11px] text-slate-400">
+                Landlord Plus (automated management) from £49.99/month. All
+                other portals are free to use.
+              </p>
+            </div>
 
-          {/* Admin console */}
-          <PortalCard
-            title="Admin console"
-            description="Cross-platform view of jobs, landlords and contractors."
-            metaTitle="Demo environment: Sandbox"
-            metaBody="Jobs, landlords, people, and settings."
-            href="/admin"
-            cta="Enter"
-            icon={<ShieldCheck className="h-5 w-5" />}
-          />
+            {/* Right-hand summary cards */}
+            <div className="grid gap-4">
+              <FeatureCard
+                icon={<Building2 size={18} />}
+                title="For landlords & owners"
+                body="See every property, request and invoice in one place. Approve work with a click and let Propti handle the updates."
+              />
+              <FeatureCard
+                icon={<Users size={18} />}
+                title="For agents"
+                body="A shared workspace for your team to coordinate maintenance, keep landlords reassured and tenants in the loop."
+              />
+              <FeatureCard
+                icon={<Wrench size={18} />}
+                title="For tenants & contractors"
+                body="Tenants log issues with photos. Contractors see clear jobs, time slots and access notes. Everyone knows what’s happening."
+              />
+            </div>
+          </div>
+        </section>
 
-          {/* NEW: Landlord owner portal */}
-          <PortalCard
-            title="Owner portal"
-            description="Single-property view for individual landlords."
-            metaTitle="Demo owner: 22 Anthony House"
-            metaBody="Approve work, see history, access documents."
-            href="/owner"
-            cta="Enter"
-            icon={<Home className="h-5 w-5" />}
-          />
+        {/* HOW IT WORKS */}
+        <section className="bg-white border-b border-slate-200">
+          <div className="max-w-6xl mx-auto px-4 py-10 md:py-12">
+            <h2 className="text-lg md:text-xl font-semibold text-slate-900 mb-2">
+              How Propti fits around your existing lettings workflow
+            </h2>
+            <p className="text-sm text-slate-500 mb-6 max-w-2xl">
+              Keep using the tools you already know – Propti quietly owns the
+              maintenance layer in the middle, so every job has a clear home.
+            </p>
 
-          {/* NEW: Agent portal */}
-          <PortalCard
-            title="Agent portal"
-            description="Manage tenancies, coordinate maintenance, and keep everyone updated."
-            metaTitle="Demo agency: Central Gate Estates"
-            metaBody="Tenancies, landlords, tenants, and references."
-            href="/agent"
-            cta="Enter"
-            icon={<Briefcase className="h-5 w-5" />}
-          />
+            <div className="grid gap-4 md:grid-cols-3">
+              <StepCard
+                step="1"
+                title="Tenant reports the issue"
+                body="They log the problem in their portal with photos, notes and preferred time slots. No more unclear WhatsApps or missing context."
+              />
+              <StepCard
+                step="2"
+                title="Landlord or agent approves"
+                body="The right person approves the job, picks or invites a contractor, and Propti keeps everyone synced on status."
+              />
+              <StepCard
+                step="3"
+                title="Contractor completes, record is kept"
+                body="Trades see their jobs, attend, mark complete, and upload evidence. You keep a clean history for every property."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* VALUE SECTION */}
+        <section className="bg-slate-950 text-slate-50">
+          <div className="max-w-6xl mx-auto px-4 py-10 md:py-12 grid gap-8 md:grid-cols-[1.2fr,0.8fr] items-center">
+            <div>
+              <p className="text-xs tracking-[0.25em] text-slate-400 mb-2">
+                WHY PROPTI
+              </p>
+              <h2 className="text-xl md:text-2xl font-semibold mb-3">
+                Built by people who actually manage properties.
+              </h2>
+              <p className="text-sm text-slate-300 mb-4 max-w-xl">
+                Propti started as a way to handle maintenance more cleanly
+                inside a real lettings business. Every screen you see comes from
+                real-world jobs, angry tenants and late-night landlord calls.
+              </p>
+              <ul className="text-xs text-slate-200 space-y-1.5">
+                <li>• Designed around UK lettings and tenancies</li>
+                <li>• Works whether the landlord is hands-on or hands-off</li>
+                <li>• Gives trades a simple, mobile-friendly job view</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <MiniStat
+                icon={<ShieldCheck size={16} />}
+                title="Maintenance-first, not CRM-first"
+                body="Propti sits alongside your CRM or spreadsheets – it doesn’t try to replace your whole stack."
+              />
+              <MiniStat
+                icon={<MessageSquare size={16} />}
+                title="Fewer chasing messages"
+                body="Everyone checks the same source of truth instead of going hunting through WhatsApp and email chains."
+              />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* FOOTER */}
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[11px] text-slate-400">
+            © {new Date().getFullYear()} Propti – maintenance-first property
+            workflows.
+          </p>
+          <div className="flex items-center gap-4 text-[11px] text-slate-400">
+            <Link
+              href="/portals"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              View demo portals
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <span>Demo only – no real data, no real charges.</span>
+          </div>
         </div>
+      </footer>
+    </div>
+  );
+}
 
-        <p className="mt-10 text-center text-xs text-slate-400">
-          🔒 Demo environment – no real data, no real charges. Propti · Built
-          for maintenance-first property management.
-        </p>
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}
+
+function FeatureCard({ icon, title, body }: FeatureCardProps) {
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <div className="h-9 w-9 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
+          {icon}
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+          <p className="text-xs text-slate-500 mt-1">{body}</p>
+        </div>
       </div>
     </div>
   );
 }
 
-interface PortalCardProps {
+interface StepCardProps {
+  step: string;
   title: string;
-  description: string;
-  metaTitle: string;
-  metaBody: string;
-  href: string;
-  cta: string;
-  icon: React.ReactNode;
+  body: string;
 }
 
-function PortalCard({
-  title,
-  description,
-  metaTitle,
-  metaBody,
-  href,
-  cta,
-  icon,
-}: PortalCardProps) {
+function StepCard({ step, title, body }: StepCardProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-          <p className="text-sm text-slate-500 mt-1">{description}</p>
-        </div>
-        <div className="h-9 w-9 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500">
-          {icon}
-        </div>
+    <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 h-full">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="h-6 w-6 rounded-full bg-slate-900 text-white text-xs flex items-center justify-center">
+          {step}
+        </span>
+        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
       </div>
+      <p className="text-xs text-slate-500">{body}</p>
+    </div>
+  );
+}
 
-      <div className="flex items-end justify-between gap-4 mt-2">
-        <div>
-          <p className="text-xs font-medium text-slate-500">{metaTitle}</p>
-          <p className="text-xs text-slate-400">{metaBody}</p>
-        </div>
-        <Link href={href}>
-          <button className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium">
-            {cta}
-          </button>
-        </Link>
+interface MiniStatProps {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}
+
+function MiniStat({ icon, title, body }: MiniStatProps) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="h-8 w-8 rounded-full bg-slate-900 flex items-center justify-center text-slate-50">
+        {icon}
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-slate-50">{title}</p>
+        <p className="text-[11px] text-slate-300">{body}</p>
       </div>
     </div>
   );
