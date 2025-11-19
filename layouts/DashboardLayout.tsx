@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { cn } from "../lib/utils";
-import { Button } from "../components/ui/button";
+import { LogoutButton } from "../components/logout-button";
 import { Home, ClipboardList, Building2, Settings as SettingsIcon } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -50,7 +50,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-end px-6">
           <div className="flex items-center gap-4">
             <p className="text-sm text-slate-600">Hello, Bradley</p>
-            <Button variant="outline">Logout</Button>
+            <LogoutButton />
           </div>
         </header>
 

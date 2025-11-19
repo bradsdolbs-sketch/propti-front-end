@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import DemoBanner from "../components/ui/demo-banner";
 import { cn } from "../lib/utils";
-import { Button } from "../components/ui/button";
+import { LogoutButton } from "../components/logout-button";
 import NotificationBell from "../components/ui/notification-bell";
 
 import {
@@ -74,7 +74,7 @@ export default function ContractorLayout({ children }: ContractorLayoutProps) {
           <div className="flex items-center gap-4">
             <NotificationBell role="contractor" />
             <p className="text-sm text-slate-600">Hello, Contractor</p>
-            <Button variant="outline">Logout</Button>
+            <LogoutButton />
           </div>
         </header>
 

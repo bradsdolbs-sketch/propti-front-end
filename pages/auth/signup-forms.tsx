@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-import { Button } from "../../components/ui/button"
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useRouter } from "next/router";
+import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 
@@ -11,35 +12,72 @@ type SignupPayload = {
   role: string;
 };
 
-const defaultPayload: SignupPayload = {
-  fullName: "",
+type SignupFormState = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: string;
+};
+
+const defaultFormState: SignupFormState = {
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
   role: "landlord-plus",
 };
 
 const SignupForm = ({ defaultRole = "landlord-plus" }: { defaultRole?: string }) => {
-  const [form, setForm] = useState({ ...defaultPayload, role: defaultRole });
+  const router = useRouter();
+  const [form, setForm] = useState({ ...defaultFormState, role: defaultRole });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
-  const update = (key: keyof SignupPayload) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const dashboardRoutes: Record<string, string> = {
+    "landlord-plus": "/landlord",
+    agent: "/agent",
+    owner: "/owner",
+    tenant: "/tenant",
+    contractor: "/contractor",
+  };
+
+  const update = (key: keyof SignupFormState) => (e: ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
     setFeedback("");
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    const payload: SignupPayload = {
+      fullName,
+      email: form.email,
+      password: form.password,
+      role: form.role,
+    };
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error((await res.text()) || "Signup failed");
+      if (res.status !== 201) throw new Error((await res.text()) || "Signup failed");
+      const data = await res.json().catch(() => ({}));
+      if (data?.token) {
+        sessionStorage.setItem("propti_auth_token", data.token as string);
+      }
       setStatus("success");
-      setFeedback("Account created! Check your email for next steps.");
-      setForm({ ...defaultPayload, role: defaultRole });
+      setFeedback("Account created! Taking you to your workspace...");
+      sessionStorage.setItem("propti_auth_ok", "true");
+      sessionStorage.setItem("propti_auth_role", data?.role || form.role);
+      if (data?.userId) {
+        sessionStorage.setItem("propti_auth_user", data.userId as string);
+      }
+      const destination = dashboardRoutes[form.role] || "/portals";
+      setForm({ ...defaultFormState, role: defaultRole });
+      router.push(destination);
     } catch (err) {
       setStatus("error");
       setFeedback(err instanceof Error ? err.message : "Unexpected error");
@@ -48,9 +86,25 @@ const SignupForm = ({ defaultRole = "landlord-plus" }: { defaultRole?: string })
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <div>
-        <Label htmlFor="fullName">Full name</Label>
-        <Input id="fullName" value={form.fullName} onChange={update("fullName")} required />
+      <div className="grid gap-3 md:grid-cols-2">
+        <div>
+          <Label htmlFor="firstName">First name</Label>
+          <Input
+            id="firstName"
+            value={form.firstName}
+            onChange={update("firstName")}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="lastName">Last name</Label>
+          <Input
+            id="lastName"
+            value={form.lastName}
+            onChange={update("lastName")}
+            required
+          />
+        </div>
       </div>
       <div>
         <Label htmlFor="email">Email</Label>

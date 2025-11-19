@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import DemoBanner from "../components/ui/demo-banner";
 import { cn } from "../lib/utils";
-import { Button } from "../components/ui/button";
+import { LogoutButton } from "../components/logout-button";
 import {
   Home,
   ClipboardList,
@@ -76,7 +76,7 @@ export default function TenantLayout({ children }: TenantLayoutProps) {
           </div>
           <div className="flex items-center gap-4">
             <p className="text-sm text-slate-600">Hello, Danise</p>
-            <Button variant="outline">Logout</Button>
+            <LogoutButton />
           </div>
         </header>
 
