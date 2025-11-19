@@ -188,10 +188,9 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-[11px] text-slate-400">
-            © {new Date().getFullYear()} Propti – maintenance-first property
-            workflows.
+            © {new Date().getFullYear()} Propti – maintenance-first property workflows.
           </p>
-          <div className="flex items-center gap-4 text-[11px] text-slate-400">
+          <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
             <Link
               href="/portals"
               className="hover:text-slate-700 underline-offset-2 hover:underline"
@@ -199,7 +198,47 @@ export default function LandingPage() {
               View demo portals
             </Link>
             <span className="hidden sm:inline">·</span>
-            <span>Demo only – no real data, no real charges.</span>
+            <Link
+              href="/legal/privacy"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              Privacy Policy
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/legal/cookie-policy"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              Cookie Policy
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/legal/landlord-terms"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              Landlord Terms
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/legal/tenant-terms"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              Tenant Terms
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/legal/contractor-agreement"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              Contractor Agreement
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/legal/dpa"
+              className="hover:text-slate-700 underline-offset-2 hover:underline"
+            >
+              DPA
+            </Link>
           </div>
         </div>
       </footer>
