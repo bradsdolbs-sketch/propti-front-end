@@ -21,18 +21,9 @@ export function LogoutButton({ label = "Logout" }: LogoutButtonProps) {
 
   const handleLogout = async () => {
     setLoading(true);
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch {
-      // Best-effort logout: even if the network call fails, clear client state.
-    } finally {
-      clearAuth();
-      router.push("/login");
-      setLoading(false);
-    }
+    clearAuth();
+    router.push("/handler/sign-out");
+    setLoading(false);
   };
 
   return (

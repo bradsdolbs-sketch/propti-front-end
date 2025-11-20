@@ -94,11 +94,11 @@ export default function SignupFormPage() {
                 Create your account
               </CardTitle>
               <CardDescription className="text-sm text-slate-500">
-                All fields are required.
+                Use the built-in auth flow to sign up.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SignupForm key={selectedPortal} defaultRole={selectedPortal} />
+              <SignupForm />
             </CardContent>
           </Card>
         </div>
