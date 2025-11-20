@@ -4,7 +4,10 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+<<<<<<< HEAD
 import { ArrowLeft } from "lucide-react";
+=======
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
 import {
   Card,
   CardHeader,
@@ -45,6 +48,7 @@ export default function LoginPage() {
       const data = await res.json().catch(() => ({}));
       if (res.status !== 200) {
         const message = data?.message || "Login failed";
+<<<<<<< HEAD
         const friendly =
           res.status === 401
             ? "We couldn't sign you in. Check your email and password."
@@ -60,6 +64,13 @@ export default function LoginPage() {
       if (data?.userId) {
         sessionStorage.setItem("propti_auth_user", data.userId);
       }
+=======
+        throw new Error(message);
+      }
+      const role = data?.role || "landlord-plus";
+      sessionStorage.setItem("propti_auth_ok", "true");
+      sessionStorage.setItem("propti_auth_role", role);
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
       setStatus("success");
       setFeedback("Welcome back! Redirecting to your workspace...");
       const destination = dashboardRoutes[role] || "/portals";
@@ -74,6 +85,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl space-y-8">
         <header>
+<<<<<<< HEAD
           <div className="flex items-center justify-between">
             <p className="text-xs tracking-[0.25em] text-slate-400 mb-2">PROPTI</p>
             <Link
@@ -84,6 +96,9 @@ export default function LoginPage() {
               Home
             </Link>
           </div>
+=======
+          <p className="text-xs tracking-[0.25em] text-slate-400 mb-2">PROPTI</p>
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
           <h1 className="text-3xl font-semibold text-slate-900 mb-2">
             Welcome back
           </h1>
@@ -154,11 +169,14 @@ export default function LoginPage() {
                     }`}
                   >
                     {feedback}
+<<<<<<< HEAD
                     {status === "error" && (
                       <span className="block text-xs text-slate-500 mt-1">
                         If you don&apos;t have an account yet, you can create one on the signup page.
                       </span>
                     )}
+=======
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
                   </p>
                 )}
               </form>

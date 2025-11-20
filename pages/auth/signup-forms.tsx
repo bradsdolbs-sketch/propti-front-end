@@ -1,7 +1,11 @@
 "use client";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/router";
+<<<<<<< HEAD
 import { Button } from "../../components/ui/button";
+=======
+import { Button } from "../../components/ui/button"
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 
@@ -30,7 +34,11 @@ const defaultFormState: SignupFormState = {
 
 const SignupForm = ({ defaultRole = "landlord-plus" }: { defaultRole?: string }) => {
   const router = useRouter();
+<<<<<<< HEAD
   const [form, setForm] = useState({ ...defaultFormState, role: defaultRole });
+=======
+  const [form, setForm] = useState({ ...defaultPayload, role: defaultRole });
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
@@ -42,7 +50,11 @@ const SignupForm = ({ defaultRole = "landlord-plus" }: { defaultRole?: string })
     contractor: "/contractor",
   };
 
+<<<<<<< HEAD
   const update = (key: keyof SignupFormState) => (e: ChangeEvent<HTMLInputElement>) =>
+=======
+  const update = (key: keyof SignupPayload) => (e: ChangeEvent<HTMLInputElement>) =>
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleSubmit = async (e: FormEvent) => {
@@ -64,6 +76,7 @@ const SignupForm = ({ defaultRole = "landlord-plus" }: { defaultRole?: string })
         body: JSON.stringify(payload),
       });
       if (res.status !== 201) throw new Error((await res.text()) || "Signup failed");
+<<<<<<< HEAD
       const data = await res.json().catch(() => ({}));
       if (data?.token) {
         sessionStorage.setItem("propti_auth_token", data.token as string);
@@ -77,6 +90,14 @@ const SignupForm = ({ defaultRole = "landlord-plus" }: { defaultRole?: string })
       }
       const destination = dashboardRoutes[form.role] || "/portals";
       setForm({ ...defaultFormState, role: defaultRole });
+=======
+      setStatus("success");
+      setFeedback("Account created! Taking you to your workspace...");
+      sessionStorage.setItem("propti_auth_ok", "true");
+      sessionStorage.setItem("propti_auth_role", form.role);
+      const destination = dashboardRoutes[form.role] || "/portals";
+      setForm({ ...defaultPayload, role: defaultRole });
+>>>>>>> 010a4d4d37bbeaa9bac74c7e899a053acfd067bb
       router.push(destination);
     } catch (err) {
       setStatus("error");
