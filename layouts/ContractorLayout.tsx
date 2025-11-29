@@ -1,9 +1,11 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import DemoBanner from "../components/ui/demo-banner";
 import { cn } from "../lib/utils";
 import { LogoutButton } from "../components/logout-button";
+import { useRequireRole } from "../lib/auth";
+import { api } from "../lib/api";
 import NotificationBell from "../components/ui/notification-bell";
 
 import {
@@ -18,6 +20,47 @@ interface ContractorLayoutProps {
 }
 
 export default function ContractorLayout({ children }: ContractorLayoutProps) {
+  const [name, setName] = useState("Contractor");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+    const stored = window.sessionStorage.getItem("propti_auth_user");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed?.id) setUserId(parsed.id);
+        if (parsed?.name && parsed.name.trim().length > 0) {
+          setName(parsed.name);
+        } else if (parsed?.email) {
+          setName(String(parsed.email).split("@")[0]);
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+
+    api
+      .getCurrentUser()
+      .then((me) => {
+        if (cancelled) return;
+        if (me?.id) setUserId(me.id);
+        const display =
+          (me?.name && me.name.trim()) ||
+          (me?.email ? me.email.split("@")[0] : null);
+        if (display) {
+          setName(display);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useRequireRole("contractor");
   return (
     <div className="min-h-screen bg-slate-50">
       {/* FIXED SIDEBAR */}
@@ -69,11 +112,14 @@ export default function ContractorLayout({ children }: ContractorLayoutProps) {
             <p className="text-xs text-slate-500">
               View offers, manage bookings, and mark jobs as complete.
             </p>
+            {userId && (
+              <p className="text-[11px] text-slate-400 mt-1">Account: {userId}</p>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
             <NotificationBell role="contractor" />
-            <p className="text-sm text-slate-600">Hello, Contractor</p>
+            <p className="text-sm text-slate-600">Hello, {name}</p>
             <LogoutButton />
           </div>
         </header>

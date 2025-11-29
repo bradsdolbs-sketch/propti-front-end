@@ -16,6 +16,7 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
+import { setStoredRole, type PortalRole } from "../lib/auth";
 
 export default function SignupPage() {
   return (
@@ -60,6 +61,7 @@ export default function SignupPage() {
               "Landlord dashboard across all properties",
               "Billing & job history in one place",
             ]}
+            role="landlord"
           />
 
           {/* Owner – free */}
@@ -70,6 +72,7 @@ export default function SignupPage() {
             description="For individual landlords linked to a specific property via an agent or Landlord Plus account."
             icon={<KeyRound size={20} />}
             href="/signup-form?portal=owner"
+            role="owner"
             bullets={[
               "View and approve maintenance requests",
               "See property documents",
@@ -85,6 +88,7 @@ export default function SignupPage() {
             description="For agencies like Central Gate Estates running tenancies and coordinating maintenance between landlords, tenants and contractors."
             icon={<Briefcase size={20} />}
             href="/signup-form?portal=agent"
+            role="agent"
             bullets={[
               "Tenancy-level overviews",
               "Requests across your whole portfolio",
@@ -100,6 +104,7 @@ export default function SignupPage() {
             description="For tenants to report issues, share photos and track progress on maintenance without chasing via WhatsApp."
             icon={<UserRound size={20} />}
             href="/signup-form?portal=tenant"
+            role="tenant"
             bullets={[
               "Log issues in a few taps",
               "Upload photos & notes",
@@ -115,6 +120,7 @@ export default function SignupPage() {
             description="For plumbers, electricians, handymen and more to receive jobs, manage time slots and mark work as completed."
             icon={<Wrench size={20} />}
             href="/signup-form?portal=contractor"
+            role="contractor"
             bullets={[
               "View job offers and bookings",
               "See property and access notes",
@@ -141,6 +147,7 @@ interface RoleCardProps {
   href: string;
   bullets?: string[];
   highlight?: boolean;
+  role: PortalRole;
 }
 
 function RoleCard({
@@ -152,6 +159,7 @@ function RoleCard({
   href,
   bullets = [],
   highlight,
+  role,
 }: RoleCardProps) {
   return (
     <Card
@@ -222,19 +230,21 @@ function RoleCard({
         )}
 
         <div className="flex justify-end">
-          <Link href={href}>
-            <Button
-              size="sm"
-              className={
-                highlight
-                  ? "text-xs flex items-center gap-1 bg-slate-50 text-slate-900 hover:bg-slate-200"
-                  : "text-xs flex items-center gap-1"
-              }
-            >
-              Continue
-              <ArrowRight size={12} />
-            </Button>
-          </Link>
+          <Button
+            size="sm"
+            className={
+              highlight
+                ? "text-xs flex items-center gap-1 bg-slate-50 text-slate-900 hover:bg-slate-200"
+                : "text-xs flex items-center gap-1"
+            }
+            onClick={() => {
+              setStoredRole(role);
+              window.location.href = href;
+            }}
+          >
+            Continue
+            <ArrowRight size={12} />
+          </Button>
         </div>
       </CardContent>
     </Card>

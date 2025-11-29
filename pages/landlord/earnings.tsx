@@ -1,14 +1,14 @@
-import LandlordLayout from "../../../layouts/LandlordLayout";
+import LandlordLayout from "../../layouts/LandlordLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../../components/ui/card";
+} from "../../components/ui/card";
 
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import {
   Table,
   Thead,
@@ -16,10 +16,10 @@ import {
   Tr,
   Th,
   Td,
-} from "../../../components/ui/table";
+} from "../../components/ui/table";
 
 // NEW: Empty state
-import EmptyState from "../../../components/ui/empty-state";
+import EmptyState from "../../components/ui/empty-state";
 import { PoundSterling, Wallet, TrendingUp } from "lucide-react";
 
 // Temporary earnings mock

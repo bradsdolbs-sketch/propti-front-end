@@ -1,14 +1,14 @@
-import ContractorLayout from "../../layouts/ContractorLayout";
+import ContractorLayout from "../layouts/ContractorLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { contractors } from "../../lib/mockData";
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { contractors } from "../lib/mockData";
 
 const CURRENT_CONTRACTOR_ID = "CON-001";
 

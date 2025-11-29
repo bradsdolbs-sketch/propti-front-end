@@ -13,6 +13,9 @@ const clearAuth = () => {
   sessionStorage.removeItem("propti_signup_role");
   sessionStorage.removeItem("propti_auth_token");
   sessionStorage.removeItem("propti_auth_user");
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem("propti_role");
+  }
 };
 
 export function LogoutButton({ label = "Logout" }: LogoutButtonProps) {

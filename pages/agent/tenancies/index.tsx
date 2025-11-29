@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import AgentLayout from "../../../layouts/AgentLayout";
 import {
   Card,
@@ -9,6 +10,8 @@ import {
 } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
+import { api } from "../../../lib/api";
 import {
   Table,
   Thead,
@@ -18,7 +21,7 @@ import {
   Td,
 } from "../../../components/ui/table";
 
-type TenancyStatus = "Active" | "Ending soon" | "Past";
+type TenancyStatus = "Active" | "Ending soon" | "Past" | "Pending activation";
 
 interface AgentTenancyRow {
   id: string;
@@ -56,6 +59,17 @@ const mockTenancies: AgentTenancyRow[] = [
     status: "Active",
   },
   {
+    id: "TEN-1030",
+    propertyLabel: "High Street Flat",
+    postcode: "E2 6AB",
+    landlordName: "Bipin Uka",
+    tenants: "Pending tenant",
+    start: "2025-12-15",
+    end: "2026-12-14",
+    rent: 1450,
+    status: "Pending activation",
+  },
+  {
     id: "TEN-0990",
     propertyLabel: "Old Flat, N1",
     postcode: "N1 3AB",
@@ -72,6 +86,8 @@ function statusVariant(status: TenancyStatus): "success" | "warning" | "default"
   switch (status) {
     case "Active":
       return "success";
+    case "Pending activation":
+      return "warning";
     case "Ending soon":
       return "warning";
     case "Past":
@@ -84,6 +100,34 @@ function formatGBP(value: number): string {
 }
 
 export default function AgentTenanciesListPage() {
+  const [tenancies, setTenancies] = useState<AgentTenancyRow[]>(mockTenancies);
+
+  useEffect(() => {
+    // Demo: pull tenancy for tenant T-1001 to reflect backend statuses in the list
+    api
+      .getTenancyForTenant("T-1001")
+      .then((t) => {
+        setTenancies((prev) =>
+          prev.map((row) =>
+            row.id === "TEN-1030"
+              ? {
+                  ...row,
+                  status:
+                    t.referenceStatus === "COMPLETED"
+                      ? "Active"
+                      : t.tenantStatus === "ACTIVE"
+                      ? "Active"
+                      : "Pending activation",
+                }
+              : row
+          )
+        );
+      })
+      .catch(() => {
+        /* ignore */
+      });
+  }, []);
+
   return (
     <AgentLayout>
       <div className="max-w-6xl mx-auto space-y-6">
@@ -149,12 +193,20 @@ export default function AgentTenanciesListPage() {
                         </Badge>
                       </Td>
                       <Td>
-                        <Link
-                          href={`/agent/tenancies/${t.id}`}
-                          className="text-xs text-blue-600 hover:underline"
-                        >
-                          View tenancy
-                        </Link>
+                        {t.status === "Pending activation" ? (
+                          <Link href={`/agent/tenancies/${t.id}`}>
+                            <Button size="sm" variant="outline">
+                              Add to tenancy
+                            </Button>
+                          </Link>
+                        ) : (
+                          <Link
+                            href={`/agent/tenancies/${t.id}`}
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            View tenancy
+                          </Link>
+                        )}
                       </Td>
                     </Tr>
                   ))}

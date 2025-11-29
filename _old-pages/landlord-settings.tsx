@@ -1,13 +1,13 @@
-import LandlordLayout from "../../layouts/LandlordLayout";
+import LandlordLayout from "../layouts/LandlordLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 
 export default function LandlordSettingsPage() {
   return (

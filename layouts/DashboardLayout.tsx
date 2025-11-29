@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 
 import { cn } from "../lib/utils";
 import { LogoutButton } from "../components/logout-button";
+import { useRequireRole } from "../lib/auth";
 import { Home, ClipboardList, Building2, Settings as SettingsIcon } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -11,6 +12,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  useRequireRole("landlord");
   return (
     <div className="min-h-screen bg-slate-50">
       {/* FIXED SIDEBAR */}

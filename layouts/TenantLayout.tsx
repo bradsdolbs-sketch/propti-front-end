@@ -1,9 +1,11 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import DemoBanner from "../components/ui/demo-banner";
 import { cn } from "../lib/utils";
 import { LogoutButton } from "../components/logout-button";
+import { useRequireRole } from "../lib/auth";
+import { api } from "../lib/api";
 import {
   Home,
   ClipboardList,
@@ -17,6 +19,117 @@ interface TenantLayoutProps {
 }
 
 export default function TenantLayout({ children }: TenantLayoutProps) {
+  const [name, setName] = useState<string>("Tenant");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+    const rawSession = window.sessionStorage.getItem("propti_auth_user");
+    const signupName = window.localStorage.getItem("propti_signup_name");
+
+    // Immediate local fallbacks while we fetch /api/me
+    if (signupName && signupName.trim().length > 0) {
+      setName(signupName.trim());
+    } else if (rawSession) {
+      try {
+        const parsed = JSON.parse(rawSession);
+        if (parsed?.id) {
+          setUserId(parsed.id);
+        }
+        if (parsed?.name && parsed.name.trim().length > 0) {
+          setName(parsed.name);
+        } else if (parsed?.email) {
+          const friendly = String(parsed.email).split("@")[0];
+          setName(friendly);
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    // Kick off: try the current user API first to scope caches per user.
+    api
+      .getCurrentUser()
+      .then((me) => {
+        if (cancelled) return;
+        if (me?.id) {
+          setUserId(me.id);
+        }
+        const effectiveId = me?.id || userId || (rawSession ? (() => { try { const parsed = JSON.parse(rawSession); return parsed?.id; } catch { return null; } })() : null);
+        if (!effectiveId) return;
+
+        const perUserKey = `propti_user_name_${effectiveId}`;
+        const storedPerUser = window.sessionStorage.getItem(perUserKey);
+        if (storedPerUser && storedPerUser.trim().length > 0) {
+          setName(storedPerUser);
+        }
+
+        if (me?.name && me.name.trim().length > 0) {
+          setName(me.name);
+          window.sessionStorage.setItem(perUserKey, me.name);
+          return;
+        }
+
+        if (me?.email) {
+          const friendly = me.email.split("@")[0];
+          setName(friendly);
+          window.sessionStorage.setItem(perUserKey, friendly);
+          return;
+        }
+
+        // If no name/email, try a per-user signup name and then clear the shared cache
+        const signupName = window.localStorage.getItem("propti_signup_name");
+        if (signupName && signupName.trim().length > 0) {
+          const trimmed = signupName.trim();
+          api
+            .updateMyName(trimmed)
+            .then((updated) => {
+              if (cancelled) return;
+              const resolved = updated?.name || trimmed;
+              setName(resolved);
+              window.sessionStorage.setItem(perUserKey, resolved);
+              window.localStorage.removeItem("propti_signup_name");
+            })
+            .catch(() => {
+              if (cancelled) return;
+              setName(trimmed);
+              window.sessionStorage.setItem(perUserKey, trimmed);
+              // Keep the signup name for this session in case we retry
+            });
+          return;
+        }
+
+        if (rawSession) {
+          try {
+            const parsed = JSON.parse(rawSession);
+            if (parsed?.name && parsed.name.trim().length > 0) {
+              setName(parsed.name);
+              window.sessionStorage.setItem(perUserKey, parsed.name);
+            } else if (parsed?.email) {
+              const friendly = String(parsed.email).split("@")[0];
+              setName(friendly);
+              window.sessionStorage.setItem(perUserKey, friendly);
+            }
+          } catch {
+            // ignore
+          }
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // If API fails, show local signup name as best-effort without sharing globally.
+        const fallbackSignup = window.localStorage.getItem("propti_signup_name");
+        if (fallbackSignup && fallbackSignup.trim().length > 0) {
+          setName(fallbackSignup.trim());
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useRequireRole("tenant");
   return (
     <div className="min-h-screen bg-slate-50">
       {/* FIXED SIDEBAR */}
@@ -73,9 +186,14 @@ export default function TenantLayout({ children }: TenantLayoutProps) {
             <p className="text-xs text-slate-500">
               Raise issues, track progress, see rent and documents.
             </p>
+            {userId && (
+              <p className="text-[11px] text-slate-400 mt-1">
+                Account: {userId}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-4">
-            <p className="text-sm text-slate-600">Hello, Danise</p>
+            <p className="text-sm text-slate-600">Hello, {name}</p>
             <LogoutButton />
           </div>
         </header>

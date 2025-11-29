@@ -1,14 +1,14 @@
 import { useRouter } from "next/router";
-import TenantLayout from "../../../layouts/TenantLayout";
+import TenantLayout from "../../../../layouts/TenantLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../../components/ui/card";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+} from "../../../../components/ui/card";
+import { Badge } from "../../../../components/ui/badge";
+import { Button } from "../../../../components/ui/button";
 
 type RequestStatus = "Awaiting Landlord" | "Booked" | "In Progress" | "Completed";
 type RequestPriority = "Urgent" | "Standard";

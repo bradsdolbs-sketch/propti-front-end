@@ -1,11 +1,11 @@
-import ContractorLayout from "../../layouts/ContractorLayout";
+import ContractorLayout from "../layouts/ContractorLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
+} from "../components/ui/card";
 import {
   Table,
   Thead,
@@ -13,9 +13,9 @@ import {
   Tr,
   Th,
   Td,
-} from "../../components/ui/table";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
+} from "../components/ui/table";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import Link from "next/link";
 
 import {
@@ -24,7 +24,7 @@ import {
   contractors,
   UnifiedStatus,
   Priority,
-} from "../../lib/mockData";
+} from "../lib/mockData";
 
 const CURRENT_CONTRACTOR_ID = "CON-001";
 

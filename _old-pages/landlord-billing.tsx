@@ -1,12 +1,12 @@
-import LandlordLayout from "../../layouts/LandlordLayout";
+import LandlordLayout from "../layouts/LandlordLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
-import { Badge } from "../../components/ui/badge";
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
 import {
   Table,
   Thead,
@@ -14,8 +14,8 @@ import {
   Tr,
   Th,
   Td,
-} from "../../components/ui/table";
-import { Button } from "../../components/ui/button";
+} from "../components/ui/table";
+import { Button } from "../components/ui/button";
 
 type InvoiceStatus = "Paid" | "Pending" | "Overdue";
 

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import DemoBanner from "../components/ui/demo-banner";
 import { cn } from "../lib/utils";
 import { LogoutButton } from "../components/logout-button";
+import { useRequireRole } from "../lib/auth";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -21,6 +22,7 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  useRequireRole("admin");
   return (
     <div className="min-h-screen bg-slate-50">
       {/* FIXED SIDEBAR */}

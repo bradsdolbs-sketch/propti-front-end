@@ -1,11 +1,11 @@
-import TenantLayout from "../../layouts/TenantLayout";
+import TenantLayout from "../layouts/TenantLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
+} from "../components/ui/card";
 import {
   Table,
   Thead,
@@ -13,9 +13,9 @@ import {
   Tr,
   Th,
   Td,
-} from "../../components/ui/table";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
+} from "../components/ui/table";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 
 type DocumentStatus = "Available" | "Pending" | "Expired";
 

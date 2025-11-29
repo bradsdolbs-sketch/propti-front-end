@@ -1,14 +1,14 @@
-import TenantLayout from "../../../layouts/TenantLayout";
+import TenantLayout from "../../layouts/TenantLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../../components/ui/card";
+} from "../../components/ui/card";
 
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import {
   Table,
   Thead,
@@ -16,9 +16,9 @@ import {
   Tr,
   Th,
   Td,
-} from "../../../components/ui/table";
+} from "../../components/ui/table";
 
-import EmptyState from "../../../components/ui/empty-state";
+import EmptyState from "../../components/ui/empty-state";
 import { PoundSterling, CalendarClock, Receipt } from "lucide-react";
 
 // Temporary mock data

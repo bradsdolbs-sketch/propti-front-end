@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import AgentLayout from "../../../layouts/AgentLayout";
 import {
   Card,
@@ -9,8 +10,9 @@ import {
 } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { api } from "../../../lib/api";
 
-type TenancyStatus = "Active" | "Ending soon" | "Past";
+type TenancyStatus = "Active" | "Ending soon" | "Past" | "Pending activation";
 
 interface AgentTenancyDetail {
   id: string;
@@ -56,7 +58,7 @@ const tenancies: AgentTenancyDetail[] = [
     end: "2026-11-30",
     rent: 1750,
     deposit: 2000,
-    status: "Active",
+    status: "Pending activation",
     tenantPortalEnabled: false,
     landlordPortalEnabled: true,
   },
@@ -66,6 +68,8 @@ function statusVariant(status: TenancyStatus): "success" | "warning" | "default"
   switch (status) {
     case "Active":
       return "success";
+    case "Pending activation":
+      return "warning";
     case "Ending soon":
       return "warning";
     case "Past":
@@ -95,10 +99,37 @@ export default function AgentTenancyDetailPage() {
 
   const startDate = new Date(tenancy.start).toLocaleDateString("en-GB");
   const endDate = new Date(tenancy.end).toLocaleDateString("en-GB");
+  const [statusState, setStatusState] = useState<TenancyStatus>(tenancy.status);
+  const [tenantPortalEnabled, setTenantPortalEnabled] = useState<boolean>(
+    tenancy.tenantPortalEnabled
+  );
+  const [referenceStatus, setReferenceStatus] = useState<"NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | null>(null);
+  const [agreementStatus, setAgreementStatus] = useState<"NOT_SENT" | "SENT" | "SIGNED" | null>(null);
+  const [tenancyId, setTenancyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    api
+      .getTenancyForTenant("T-1001")
+      .then((t) => {
+        setTenancyId(t.id);
+        setReferenceStatus(t.referenceStatus ?? null);
+        setAgreementStatus(t.agreementStatus ?? null);
+      })
+      .catch(() => {
+        /* demo */
+      });
+  }, []);
 
   return (
     <AgentLayout>
       <div className="max-w-5xl mx-auto space-y-6">
+        {statusState === "Pending activation" && (
+          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-800">
+            Tenant portal is not activated yet. Add the tenant to this tenancy to switch them from
+            “waiting” to “active” in their portal.
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -116,8 +147,8 @@ export default function AgentTenancyDetailPage() {
             </p>
           </div>
           <div className="text-right space-y-2">
-            <Badge variant={statusVariant(tenancy.status)}>
-              {tenancy.status}
+            <Badge variant={statusVariant(statusState)}>
+              {statusState}
             </Badge>
             <p className="text-xs text-slate-500">
               Term: <span className="font-medium">{startDate}</span> –{" "}
@@ -181,17 +212,31 @@ export default function AgentTenancyDetailPage() {
               <div>
                 <p className="text-xs text-slate-500">Tenant portal</p>
                 <Badge
-                  variant={tenancy.tenantPortalEnabled ? "success" : "default"}
+                  variant={tenantPortalEnabled ? "success" : "default"}
                 >
-                  {tenancy.tenantPortalEnabled ? "Enabled" : "Disabled"}
+                  {tenantPortalEnabled ? "Enabled" : "Disabled"}
                 </Badge>
+                {!tenantPortalEnabled && (
+                  <p className="text-xs text-amber-700 mt-1">
+                    Tenants currently see “We’re setting up your tenancy.”
+                  </p>
+                )}
               </div>
               <p className="text-[11px] text-slate-400">
                 In future this would show which tenants have activated their
                 accounts and last login times.
               </p>
-              <Button size="sm" variant="outline" disabled>
-                Manage tenant access (demo)
+              <Button
+                size="sm"
+                variant={statusState === "Pending activation" ? "default" : "outline"}
+                onClick={() => {
+                  setTenantPortalEnabled(true);
+                  setStatusState("Active");
+                }}
+              >
+                {statusState === "Pending activation"
+                  ? "Add tenant to tenancy (demo)"
+                  : "Manage tenant access (demo)"}
               </Button>
             </CardContent>
           </Card>
@@ -290,6 +335,71 @@ export default function AgentTenancyDetailPage() {
               <Button size="sm" variant="outline" disabled>
                 Open reference pack (demo)
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* References + Agreement actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>References & Agreement</CardTitle>
+              <CardDescription>
+                Move the tenancy forward once checks are done.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">References:</span>
+                <Badge variant={referenceStatus === "COMPLETED" ? "success" : "warning"}>
+                  {referenceStatus ?? "N/A"}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">Agreement:</span>
+                <Badge variant={agreementStatus === "SIGNED" ? "success" : "default"}>
+                  {agreementStatus ?? "N/A"}
+                </Badge>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {tenancyId && referenceStatus !== "COMPLETED" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      if (!tenancyId) return;
+                      const res = await api.completeReferences(tenancyId);
+                      setReferenceStatus(res.referenceStatus ?? null);
+                    }}
+                  >
+                    Mark references complete
+                  </Button>
+                )}
+                {tenancyId && agreementStatus === "NOT_SENT" && (
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      const res = await api.sendAgreement(tenancyId);
+                      setAgreementStatus(res.agreementStatus ?? null);
+                    }}
+                  >
+                    Send agreement
+                  </Button>
+                )}
+                {tenancyId && agreementStatus === "SENT" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      const res = await api.signAgreement(tenancyId);
+                      setAgreementStatus(res.agreementStatus ?? null);
+                    }}
+                  >
+                    Mark signed
+                  </Button>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Demo flow only; in production this would trigger emails/signature requests and attach the signed PDF.
+              </p>
             </CardContent>
           </Card>
         </div>

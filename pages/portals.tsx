@@ -7,6 +7,7 @@ import {
   Home,
   Briefcase,
 } from "lucide-react";
+import { setStoredRole, type PortalRole } from "../lib/auth";
 
 export default function PortalChooserPage() {
   return (
@@ -33,10 +34,11 @@ export default function PortalChooserPage() {
             description="Approve requests, assign contractors, see billing."
             metaTitle="Demo user: Central Gate Estates"
             metaBody="Properties, requests, billing and settings."
-            href="/landlord"
-            cta="Enter"
-            icon={<Building2 className="h-5 w-5" />}
-          />
+          href="/landlord"
+          cta="Enter"
+          icon={<Building2 className="h-5 w-5" />}
+          role="landlord"
+        />
 
           {/* Tenant portal */}
           <PortalCard
@@ -44,10 +46,11 @@ export default function PortalChooserPage() {
             description="Raise issues, track progress, see job history."
             metaTitle="Demo property: 22 Anthony House"
             metaBody="AI triage, requests and status updates."
-            href="/tenant"
-            cta="Enter"
-            icon={<UserRound className="h-5 w-5" />}
-          />
+          href="/tenant"
+          cta="Enter"
+          icon={<UserRound className="h-5 w-5" />}
+          role="tenant"
+        />
 
           {/* Contractor portal */}
           <PortalCard
@@ -55,10 +58,11 @@ export default function PortalChooserPage() {
             description="View offers, booked jobs, and mark work complete."
             metaTitle="Demo company: ABC Plumbing"
             metaBody="Jobs list and job details."
-            href="/contractor"
-            cta="Enter"
-            icon={<Wrench className="h-5 w-5" />}
-          />
+          href="/contractor"
+          cta="Enter"
+          icon={<Wrench className="h-5 w-5" />}
+          role="contractor"
+        />
 
           {/* Admin console */}
           <PortalCard
@@ -66,10 +70,11 @@ export default function PortalChooserPage() {
             description="Cross-platform view of jobs, landlords and contractors."
             metaTitle="Demo environment: Sandbox"
             metaBody="Jobs, landlords, people, and settings."
-            href="/admin"
-            cta="Enter"
-            icon={<ShieldCheck className="h-5 w-5" />}
-          />
+          href="/admin"
+          cta="Enter"
+          icon={<ShieldCheck className="h-5 w-5" />}
+          role="admin"
+        />
 
           {/* Owner portal */}
           <PortalCard
@@ -77,10 +82,11 @@ export default function PortalChooserPage() {
             description="Single-property view for individual landlords."
             metaTitle="Demo owner: 22 Anthony House"
             metaBody="Approve work, see history, access documents."
-            href="/owner"
-            cta="Enter"
-            icon={<Home className="h-5 w-5" />}
-          />
+          href="/owner"
+          cta="Enter"
+          icon={<Home className="h-5 w-5" />}
+          role="owner"
+        />
 
           {/* Agent portal */}
           <PortalCard
@@ -88,10 +94,11 @@ export default function PortalChooserPage() {
             description="Manage tenancies, coordinate maintenance, and keep everyone updated."
             metaTitle="Demo agency: Central Gate Estates"
             metaBody="Tenancies, landlords, tenants, and references."
-            href="/agent"
-            cta="Enter"
-            icon={<Briefcase className="h-5 w-5" />}
-          />
+          href="/agent"
+          cta="Enter"
+          icon={<Briefcase className="h-5 w-5" />}
+          role="agent"
+        />
         </div>
 
         <p className="mt-10 text-center text-xs text-slate-400">
@@ -103,6 +110,7 @@ export default function PortalChooserPage() {
   );
 }
 
+
 interface PortalCardProps {
   title: string;
   description: string;
@@ -111,6 +119,7 @@ interface PortalCardProps {
   href: string;
   cta: string;
   icon: React.ReactNode;
+  role?: PortalRole;
 }
 
 function PortalCard({
@@ -121,6 +130,7 @@ function PortalCard({
   href,
   cta,
   icon,
+  role,
 }: PortalCardProps) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
@@ -139,7 +149,14 @@ function PortalCard({
           <p className="text-xs font-medium text-slate-500">{metaTitle}</p>
           <p className="text-xs text-slate-400">{metaBody}</p>
         </div>
-        <Link href={href}>
+        <Link
+          href={href}
+          onClick={() => {
+            if (role) {
+              setStoredRole(role);
+            }
+          }}
+        >
           <button className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium">
             {cta}
           </button>

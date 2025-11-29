@@ -1,14 +1,14 @@
-import TenantLayout from "../../layouts/TenantLayout";
+import TenantLayout from "../layouts/TenantLayout";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { tenants, properties } from "../../lib/mockData";
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { tenants, properties } from "../lib/mockData";
 
 const CURRENT_TENANT_ID = "T-1001";
 

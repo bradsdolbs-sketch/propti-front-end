@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import {
   Building2,
@@ -8,8 +9,48 @@ import {
   MessageSquare,
   ArrowRight,
 } from "lucide-react";
+import { getStoredRole, roleToPortal, setStoredRole } from "../lib/auth";
+import { api } from "../lib/api";
 
 export default function LandingPage() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    let cancelled = false;
+
+    const storedRole = getStoredRole();
+    if (storedRole) setRole(storedRole);
+
+    const hasCookie = document.cookie.includes("stack-access");
+    setLoggedIn(hasCookie);
+
+    api
+      .getCurrentUser()
+      .then((me) => {
+        if (cancelled) return;
+        if (me?.role) {
+          setRole(me.role);
+          setStoredRole(me.role as any);
+        }
+        // If the call worked, we know we're logged in.
+        setLoggedIn(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // Fall back to cookie detection; keep logged in if cookie exists.
+        setLoggedIn(document.cookie.includes("stack-access"));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const portalHref = role ? roleToPortal(role as any) : loggedIn ? "/post-auth" : "/signup";
+  const fallbackHref = "/post-auth";
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* NAVBAR */}
@@ -30,21 +71,46 @@ export default function LandingPage() {
             </div>
           </Link>
 
-          {/* Right side: auth buttons */}
+          {/* Right side: auth buttons or portal CTA when logged in */}
           <nav className="flex items-center gap-3">
-            <Link href="/login">
-              <Button
-                variant="outline"
-                className="text-xs sm:text-sm px-3 py-1.5"
-              >
-                Sign in
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="text-xs sm:text-sm px-3 py-1.5">
-                Create account
-              </Button>
-            </Link>
+            {loggedIn ? (
+              <>
+                <Link href={portalHref || fallbackHref}>
+                  <Button className="text-xs sm:text-sm px-3 py-1.5">
+                    Go to portal
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  className="text-xs sm:text-sm px-3 py-1.5"
+                  onClick={() => {
+                    // Clear stored role and rely on auth logout page
+                    if (typeof window !== "undefined") {
+                      window.localStorage.removeItem("propti_role");
+                      window.location.href = "/handler/sign-out";
+                    }
+                  }}
+                >
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    className="text-xs sm:text-sm px-3 py-1.5"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="text-xs sm:text-sm px-3 py-1.5">
+                    Create account
+                  </Button>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>

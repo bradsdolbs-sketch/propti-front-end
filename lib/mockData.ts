@@ -31,6 +31,7 @@ export interface Tenant {
   id: string;
   name: string;
   propertyId: string;
+  tenancyStatus?: "pending" | "active";
 }
 
 export interface Contractor {
@@ -55,6 +56,11 @@ export interface MaintenanceRequest {
   status: UnifiedStatus;
   issueTitle: string;
   description: string;
+  tenantName?: string;
+  landlordName?: string;
+  contractorName?: string;
+  accessNotes?: string;
+  photos?: string[];
   tenantAvailability?: string;
   fee: string;
   createdAt: string;   // ISO-ish date string
@@ -99,11 +105,13 @@ export const tenants: Tenant[] = [
     id: "T-1001",
     name: "Danise Fang",
     propertyId: "PROP-2001",
+    tenancyStatus: "pending",
   },
   {
     id: "T-1002",
     name: "Phuong Nguyen",
     propertyId: "PROP-2001",
+    tenancyStatus: "active",
   },
 ];
 
@@ -155,6 +163,10 @@ export const maintenanceRequests: MaintenanceRequest[] = [
     issueTitle: "Boiler not working",
     description:
       "Boiler stopped working last night. No heating or hot water, display flashing error code.",
+    tenantName: "Danise Fang",
+    landlordName: "Central Gate Estates",
+    accessNotes: "Concierge has a spare set of keys if needed.",
+    photos: ["boiler-1", "boiler-2", "boiler-3"],
     fee: "£140",
     createdAt: "2025-11-10T09:30:00Z",
     lastUpdate: "2025-11-12T14:15:00Z",
@@ -171,6 +183,11 @@ export const maintenanceRequests: MaintenanceRequest[] = [
     issueTitle: "Leaking kitchen sink",
     description:
       "Slow leak from pipework under kitchen sink. Bucket currently catching water.",
+    tenantName: "Danise Fang",
+    landlordName: "Central Gate Estates",
+    contractorName: "ABC Plumbing",
+    accessNotes: "Tenant works from home – please knock loudly.",
+    photos: ["sink-1", "sink-2"],
     fee: "£120",
     createdAt: "2025-11-07T10:00:00Z",
     lastUpdate: "2025-11-11T09:00:00Z",
@@ -187,6 +204,10 @@ export const maintenanceRequests: MaintenanceRequest[] = [
     issueTitle: "Extractor fan not working",
     description:
       "Bathroom extractor fan not turning on. Likely electrical issue.",
+    tenantName: "Phuong Nguyen",
+    landlordName: "Central Gate Estates",
+    contractorName: "Ventilation Co",
+    photos: [],
     fee: "£110",
     createdAt: "2025-10-28T09:00:00Z",
     lastUpdate: "2025-10-30T16:30:00Z",
@@ -203,6 +224,9 @@ export const maintenanceRequests: MaintenanceRequest[] = [
     issueTitle: "Window latch loose",
     description:
       "Living room window latch is loose and doesn’t fully close. Draught coming in.",
+    tenantName: "Danise Fang",
+    landlordName: "Central Gate Estates",
+    photos: [],
     fee: "£80",
     createdAt: "2025-10-20T11:00:00Z",
     lastUpdate: "2025-10-21T15:45:00Z",

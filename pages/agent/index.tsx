@@ -1,4 +1,5 @@
 import AgentLayout from "../../layouts/AgentLayout";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,6 +10,7 @@ import {
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { maintenanceRequests } from "../../lib/mockData";
+import { api, AgentStatus } from "../../lib/api";
 
 const ACTIVE_TENANCIES = 18;
 const LANDLORDS = 11;
@@ -16,6 +18,81 @@ const TENANTS = 36;
 const PENDING_REFERENCES = 3;
 
 export default function AgentDashboardPage() {
+  const AGENT_ID = "agent-123";
+  const [agentStatus, setAgentStatus] = useState<AgentStatus>("PENDING");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [latestTenancy, setLatestTenancy] = useState<string | null>(null);
+  const [latestRefStatus, setLatestRefStatus] = useState<string | null>(null);
+  const [latestAgreementStatus, setLatestAgreementStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    api
+      .getAgentStatus(AGENT_ID)
+      .then((res) => setAgentStatus(res.status))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Demo fetch: pull tenant T-1001 tenancy to show statuses
+  useEffect(() => {
+    api
+      .getTenancyForTenant("T-1001")
+      .then((t) => {
+        setLatestTenancy(t.id);
+        setLatestRefStatus(t.referenceStatus ?? null);
+        setLatestAgreementStatus(t.agreementStatus ?? null);
+      })
+      .catch(() => {
+        /* ignore for dashboard */
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <AgentLayout>
+        <div className="max-w-4xl mx-auto mt-8 text-sm text-slate-600">
+          Checking your verification status...
+        </div>
+      </AgentLayout>
+    );
+  }
+
+  if (agentStatus === "PENDING") {
+    return (
+      <AgentLayout>
+        <div className="max-w-3xl mx-auto mt-10">
+          <Card>
+            <CardHeader>
+              <CardTitle>Verification pending</CardTitle>
+              <CardDescription>
+                Complete verification to access the agent dashboard.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-slate-600">
+              <p>
+                Once you&apos;re verified, you&apos;ll see tenancies, landlords,
+                and maintenance in this workspace.
+              </p>
+              {error && (
+                <p className="text-xs text-amber-700">
+                  Couldn&apos;t sync status ({error}). You can retry verification below.
+                </p>
+              )}
+              <Button
+                onClick={() =>
+                  api.verifyAgent(AGENT_ID).then((res) => setAgentStatus(res.status))
+                }
+              >
+                Mark as verified (demo)
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </AgentLayout>
+    );
+  }
+
   const openRequests = maintenanceRequests.filter(
     (r) => r.status !== "Completed"
   ).slice(0, 5);
@@ -74,9 +151,17 @@ export default function AgentDashboardPage() {
               <CardDescription>Awaiting completion</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-semibold">{PENDING_REFERENCES}</p>
+              <p className="text-3xl font-semibold">
+                {latestRefStatus
+                  ? latestRefStatus === "COMPLETED"
+                    ? "Completed"
+                    : "In progress"
+                  : PENDING_REFERENCES}
+              </p>
               <p className="text-[11px] text-slate-400 mt-1">
-                Could link directly to your reference provider later.
+                {latestRefStatus
+                  ? "Live tenancy reference status (demo)."
+                  : "Could link directly to your reference provider later."}
               </p>
             </CardContent>
           </Card>

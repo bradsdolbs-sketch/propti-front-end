@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import LandlordLayout from "../../../layouts/LandlordLayout";
 import {
   Card,
@@ -9,23 +9,51 @@ import {
 } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
+import { api } from "../../../lib/api";
 
 export default function LandlordSettingsPage() {
-  const [name, setName] = useState("Central Gate Estates");
-  const [email, setEmail] = useState("info@centralgateestates.com");
-  const [phone, setPhone] = useState("+44...");
-  const [autoApproveLimit, setAutoApproveLimit] = useState("100");
-  const [preferredComm, setPreferredComm] = useState("Email");
-  const [notifUrgent, setNotifUrgent] = useState(true);
-  const [notifCompleted, setNotifCompleted] = useState(true);
-  const [notifInvoices, setNotifInvoices] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [autoApproveLimit, setAutoApproveLimit] = useState("");
+  const [preferredComm, setPreferredComm] = useState("");
+  const [notifUrgent, setNotifUrgent] = useState(false);
+  const [notifCompleted, setNotifCompleted] = useState(false);
+  const [notifInvoices, setNotifInvoices] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getCurrentUser()
+      .then((me) => {
+        if (cancelled) return;
+        if (me?.name) setName(me.name);
+        if (me?.email) setEmail(me.email);
+        if (me?.phone) setPhone(me.phone);
+        if (me?.companyName) setCompany(me.companyName);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    // In a real app we’d POST these settings to the API.
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      await api.updateMyProfile({
+        name,
+        phone,
+        email,
+        companyName: company,
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setSaved(false);
+    }
   }
 
   return (
@@ -62,7 +90,7 @@ export default function LandlordSettingsPage() {
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  placeholder="Enter your name"
                 />
               </div>
 
@@ -74,7 +102,7 @@ export default function LandlordSettingsPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  placeholder="you@example.com"
                 />
               </div>
 
@@ -85,6 +113,17 @@ export default function LandlordSettingsPage() {
                 <Input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+44..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Company name
+                </label>
+                <Input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Company"
                 />
               </div>
             </CardContent>
